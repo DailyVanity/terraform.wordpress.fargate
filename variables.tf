@@ -6,3 +6,9 @@ variable CERT_DOMAIN {}
 variable PROJECT_NAME {}
 variable PROJECT_DOMAIN {}
 variable DEFAULT_DOCKER_TAG {}
+variable REGION {}
+variable SUBNETS {}
+variable NAME {}
+variable PROD_WORDPRESS_CLUSTER_NAME {}
+variable ECS_EXECUTION_ROLE {}
+variable ECS_TASK_ROLE {}

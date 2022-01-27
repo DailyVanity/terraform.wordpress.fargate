@@ -18,13 +18,13 @@ resource "aws_ecs_service" "wordpress-app" {
 }
 
 resource "aws_ecs_task_definition" "wordpress-task-definition" {
-  family                   = "avenueone-sg-task-definition"
+  family                   = "${var.PROJECT_DOMAIN}-task-definition"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   memory                   = "1024"
   cpu                      = "512"
-  execution_role_arn       = "arn:aws:iam::472137784967:role/ECSTaskExecutionRole"
-  task_role_arn            = "arn:aws:iam::472137784967:role/ECSTaskExecutionRole"
+  execution_role_arn       = var.ECS_EXECUTION_ROLE
+  task_role_arn            = var.ECS_TASK_ROLE
   dynamic "volume" {
     for_each = var.MOUNT_MAP
     content {
