@@ -14,8 +14,24 @@ data "aws_subnet" "private" {
   id       = each.value
 }
 
+data "aws_subnets" "public" {
+  filter {
+    name   = "vpc-id"
+    values = [var.VPC_ID]
+  }
+
+  tags = {
+    type = "public"
+  }
+}
+
+data "aws_subnet" "public" {
+  for_each = toset(data.aws_subnets.public.ids)
+  id       = each.value
+}
+
 data "aws_ecs_cluster" "wordpress-cluster" {
-  cluster_name = "prod-wordpress-cluster"
+  cluster_name = var.PROD_WORDPRESS_CLUSTER_NAME
 }
 
 data "aws_lb" "wordpress" {  
@@ -30,4 +46,8 @@ data "aws_lb_listener" "https_listener" {
 data "aws_acm_certificate" "issued" {
   domain   = var.CERT_DOMAIN
   statuses = ["ISSUED"]
+}
+
+data "aws_security_group" "alb-sg" {
+  name = var.COMMON_ALB_SG_NAME
 }

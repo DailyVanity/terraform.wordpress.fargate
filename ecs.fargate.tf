@@ -1,28 +1,34 @@
 
 resource "aws_ecs_service" "wordpress-app" {
-  name            = "${var.PROJECT_DOMAIN}"
+  name            = "${var.PROJECT_NAME}"
   cluster         = data.aws_ecs_cluster.wordpress-cluster.id
   task_definition = aws_ecs_task_definition.wordpress-task-definition.arn
   launch_type     = "FARGATE"
   network_configuration {
     subnets          = [for subnet in data.aws_subnet.private : subnet.id]
     assign_public_ip = true
-    security_groups  = [aws_security_group.http.id]
+    security_groups  = [aws_security_group.service-sg.id]
   }
   desired_count = 1
   load_balancer {
-    target_group_arn = aws_lb_target_group.avenueone-sg-wordpress-alb-https-tg.arn
+    target_group_arn = aws_lb_target_group.alb-https-tg.arn
     container_name = "nginx-container"
     container_port = 80
+  }
+
+  tags = {
+    Environment = var.ENV
+    Domains     = var.PROJECT_DOMAIN
+    Project-Name= var.PROJECT_NAME
   }
 }
 
 resource "aws_ecs_task_definition" "wordpress-task-definition" {
-  family                   = "${var.PROJECT_DOMAIN}-task-definition"
+  family                   = "${var.PROJECT_NAME}-task-definition"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  memory                   = "1024"
-  cpu                      = "512"
+  memory                   = var.MEMORY
+  cpu                      = var.CPU
   execution_role_arn       = var.ECS_EXECUTION_ROLE
   task_role_arn            = var.ECS_TASK_ROLE
   dynamic "volume" {
@@ -30,7 +36,7 @@ resource "aws_ecs_task_definition" "wordpress-task-definition" {
     content {
       name = volume.value.name
       efs_volume_configuration {
-        file_system_id = volume.value.efs_id
+        file_system_id = volume.value.file_system_id
         transit_encryption = "ENABLED"
         root_directory = volume.value.root_directory
       }

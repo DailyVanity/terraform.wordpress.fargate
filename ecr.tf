@@ -5,6 +5,16 @@ resource "aws_ecr_repository" "nginx-container" {
   image_scanning_configuration {
     scan_on_push = true
   }
+
+  tags = {
+    Environment = var.ENV
+    Domains     = var.PROJECT_DOMAIN
+    Project-Name= var.PROJECT_NAME
+  }
+
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
 
 resource "aws_ecr_repository" "php-fpm-container" {
@@ -14,6 +24,16 @@ resource "aws_ecr_repository" "php-fpm-container" {
   image_scanning_configuration {
     scan_on_push = true
   }
+
+  tags = {
+    Environment = var.ENV
+    Domains     = var.PROJECT_DOMAIN
+    Project-Name= var.PROJECT_NAME
+  }
+
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
 
 resource "aws_ecr_repository_policy" "nginx-policy" {
