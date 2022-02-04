@@ -2,8 +2,7 @@
 resource "aws_ecs_service" "wordpress-app" {
   name            = "${var.PROJECT_NAME}"
   cluster         = data.aws_ecs_cluster.wordpress-cluster.id
-  task_definition = aws_ecs_task_definition.wordpress-task-definition.arn
-  launch_type     = "FARGATE"
+  task_definition = aws_ecs_task_definition.wordpress-task-definition.arn  
   network_configuration {
     subnets          = [for subnet in data.aws_subnet.private : subnet.id]
     assign_public_ip = true
@@ -20,6 +19,20 @@ resource "aws_ecs_service" "wordpress-app" {
     Environment = var.ENV
     Domains     = var.PROJECT_DOMAIN
     Project-Name= var.PROJECT_NAME
+  }
+
+  dynamic "capacity_provider_strategy" {
+    for_each = var.PROVIDER_STRATEGY
+    content {
+      base              = capacity_provider_strategy.value.base
+      capacity_provider = capacity_provider_strategy.key
+      weight            = capacity_provider_strategy.value.weight
+    }
+  }
+  lifecycle {
+    ignore_changes = [
+      desired_count
+    ]
   }
 }
 

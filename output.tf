@@ -1,4 +1,4 @@
 output "alb_DNS" {
-  value       = aws_lb.alb.dns_name
+  value       = data.aws_lb.wordpress.arn
   description = "Application LB DNS"  
 }
