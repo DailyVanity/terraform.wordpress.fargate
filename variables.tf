@@ -19,3 +19,15 @@ variable COMMON_ALB_SG_NAME {}
 variable PROD_LOG_PREFIX {}
 variable MEMORY {}
 variable CPU {}
+variable CLUSTER_CAPACITY_WEIGHT {
+    default = {
+        FARGATE = {
+            base = 1
+            weight = 1
+        },
+        FARGATE_SPOT = {
+            base = 0
+            weight = 3
+        }
+    }
+}

@@ -3,7 +3,7 @@ resource "aws_ecs_service" "wordpress-app" {
   name            = "${var.PROJECT_NAME}"
   cluster         = data.aws_ecs_cluster.wordpress-cluster.id
   task_definition = aws_ecs_task_definition.wordpress-task-definition.arn
-  launch_type     = "FARGATE"
+  
   network_configuration {
     subnets          = [for subnet in data.aws_subnet.private : subnet.id]
     assign_public_ip = true
@@ -15,6 +15,15 @@ resource "aws_ecs_service" "wordpress-app" {
     container_name = "nginx-container"
     container_port = 80
   }
+
+  dynamic "capacity_provider_strategy" {
+    for_each = var.CLUSTER_CAPACITY_WEIGHT
+    content {
+      base = capacity_provider_strategy.value.base
+      capacity_provider = capacity_provider_strategy.key
+      weight = capacity_provider_strategy.value.weight
+    }
+  }  
 
   tags = {
     Environment = var.ENV
@@ -72,7 +81,7 @@ resource "aws_ecs_task_definition" "wordpress-task-definition" {
     {
       name      = "php-fpm-container"
       image     = "${aws_ecr_repository.php-fpm-container.repository_url}:${var.DEFAULT_DOCKER_TAG}"
-      entryPoint = ["php-fpm"]
+      entryPoint = ["php-fpm", "--allow-to-run-as-root"]
       essential = true
       portMappings = [
         {
