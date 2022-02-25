@@ -29,18 +29,38 @@ resource "aws_security_group" "service-sg" {
     Domains     = var.PROJECT_DOMAIN
     Project-Name= var.PROJECT_NAME
   }
-
 }
 
-resource "aws_security_group_rule" "alb-sg" {
+resource "aws_security_group_rule" "alb-service" {
   type              = "egress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
+  security_group_id = data.aws_security_group.alb-sg.id
+  source_security_group_id = aws_security_group.service-sg.id
+  depends_on = [aws_security_group.service-sg]
+}
+
+resource "aws_security_group_rule" "db-container-service" {
+  type              = "ingress"
+  from_port         = 3306
+  to_port           = 3306
+  protocol          = "tcp"
+  security_group_id = data.aws_security_group.db-sg.id 
+  source_security_group_id = aws_security_group.service-sg.id
+  depends_on = [aws_security_group.service-sg]
+  description = "Allowing DB to accept connection from container"
+}
+
+resource "aws_security_group_rule" "container-db-service" {
+  type              = "egress"
+  from_port         = 3306
+  to_port           = 3306
+  protocol          = "tcp"
   security_group_id = aws_security_group.service-sg.id
-  depends_on = [
-    aws_security_group.service-sg
-  ]
+  source_security_group_id = data.aws_security_group.db-sg.id
+  depends_on = [aws_security_group.service-sg]
+  description = "Allowing container to connect DB"
 }
 
 # resource "aws_security_group" "fargate-service-sg" {

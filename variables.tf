@@ -19,15 +19,93 @@ variable COMMON_ALB_SG_NAME {}
 variable PROD_LOG_PREFIX {}
 variable MEMORY {}
 variable CPU {}
-variable CLUSTER_CAPACITY_WEIGHT {
-    default = {
-        FARGATE = {
-            base = 1
-            weight = 1
-        },
-        FARGATE_SPOT = {
-            base = 0
-            weight = 3
-        }
+variable ACC_ID {}
+variable COMMON_DB_SG_NAME {}
+variable "CLUSTER_CAPACITY_WEIGHT" {
+  default = {
+    FARGATE = {
+      base = 0
+      weight = 3
+    },
+    FARGATE_SPOT = {
+      base = 1
+      weight = 1
     }
+  }
+}
+variable PROVIDER_STRATEGY {
+  default = {
+    FARGATE = {
+      base = 0
+      weight = 3
+    }
+    FARGATE_SPOT = {
+      base = 1
+      weight = 1
+    }
+  }
+}
+
+variable AUTO_SCALING {
+  default = {
+    max = 1
+    min = 1
+  }
+}
+
+variable TARGET_SCALING {
+  default = {
+    max = 1
+    min = 1
+    CONFIG = {
+      ECSServiceAverageCPUUtilization = {
+        target_value = 60
+        scale_out = 60
+        scale_in = 30
+      }
+      ECSServiceAverageMemoryUtilization = {
+        target_value = 60
+        scale_out = 60
+        scale_in = 30
+      }
+      ALBRequestCountPerTarget = {
+        target_value = 100
+        scale_out = 60
+        scale_in = 30
+      }
+    }
+  }
+}
+
+variable SCHEDULE_SCALING {
+  default = {
+    max = 1
+    min = 1
+    schedule = {
+      start = {
+        max = 4
+        min = 1
+        time = "cron(0 9 ? * MON-FRI *)"
+        timezone = "Asia/Singapore"
+      }
+      end = {
+        max = 1
+        min = 1
+        time = "cron(0 21 * * ? *)"
+        timezone = "Asia/Singapore"
+      }
+    }
+  }
+}
+
+variable CONTAINER_SECRET {
+  default = {}
+}
+
+variable LOG_GROUP {
+  default = ""
+}
+
+variable S3_ASSET_BUCKET {
+  default = ""
 }
