@@ -43,6 +43,7 @@ resource "aws_ecs_service" "wordpress-app" {
       desired_count,
       task_definition
     ]
+    create_before_destroy = true
   }
   
 }
@@ -53,7 +54,7 @@ resource "aws_ecs_task_definition" "wordpress-task-definition" {
   requires_compatibilities = ["FARGATE"]
   memory                   = var.MEMORY
   cpu                      = var.CPU
-  execution_role_arn       = var.ECS_EXECUTION_ROLE
+  execution_role_arn       = aws_iam_role.execution_role.arn
   task_role_arn            = aws_iam_role.tasks_role.arn
   dynamic "volume" {
     for_each = var.MOUNT_MAP

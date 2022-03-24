@@ -49,7 +49,7 @@ data "aws_acm_certificate" "issued" {
 }
 
 data "aws_security_group" "alb-sg" {
-  name = var.COMMON_ALB_SG_NAME
+  name = var.STEADY_ALB_SG_NAME
 }
 
 data "aws_security_group" "db-sg" {

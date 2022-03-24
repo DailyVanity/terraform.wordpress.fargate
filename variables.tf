@@ -13,7 +13,7 @@ variable ECS_TASK_ROLE {}
 variable ENV {}
 variable DOCKER_LISTENING_PORT {}
 variable LISTENING_DOMAINS {}
-variable WORDPRESS_ALB_SG_NAME {}
+variable STEADY_ALB_SG_NAME {}
 variable LOAD_BALANCER_LOGS_BUCKET {}
 variable COMMON_ALB_SG_NAME {}
 variable PROD_LOG_PREFIX {}
@@ -21,11 +21,11 @@ variable MEMORY {}
 variable CPU {}
 variable ACC_ID {}
 variable COMMON_DB_SG_NAME {}
-variable "CLUSTER_CAPACITY_WEIGHT" {
+variable CLUSTER_CAPACITY_WEIGHT {
   default = {
     FARGATE = {
       base = 0
-      weight = 3
+      weight = 2
     },
     FARGATE_SPOT = {
       base = 1
@@ -37,7 +37,7 @@ variable PROVIDER_STRATEGY {
   default = {
     FARGATE = {
       base = 0
-      weight = 3
+      weight = 2
     }
     FARGATE_SPOT = {
       base = 1
@@ -55,21 +55,21 @@ variable AUTO_SCALING {
 
 variable TARGET_SCALING {
   default = {
-    max = 1
+    max = 4
     min = 1
     CONFIG = {
       ECSServiceAverageCPUUtilization = {
-        target_value = 60
+        target_value = 75
         scale_out = 60
         scale_in = 30
       }
       ECSServiceAverageMemoryUtilization = {
-        target_value = 60
+        target_value = 40
         scale_out = 60
         scale_in = 30
       }
       ALBRequestCountPerTarget = {
-        target_value = 100
+        target_value = 150
         scale_out = 60
         scale_in = 30
       }
